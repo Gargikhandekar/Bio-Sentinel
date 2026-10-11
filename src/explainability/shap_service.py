@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import warnings
 from typing import Any
 
 import numpy as np
@@ -25,7 +26,10 @@ def shap_matrix(model, x: np.ndarray) -> np.ndarray | None:
         import shap
     except Exception:
         return None
-    return _positive_class(shap.TreeExplainer(model).shap_values(x))
+    with warnings.catch_warnings():
+        # SHAP warns on every call that LightGBM's binary output format changed; handled by _positive_class.
+        warnings.filterwarnings("ignore", message="LightGBM binary classifier")
+        return _positive_class(shap.TreeExplainer(model).shap_values(x))
 
 
 def local_contributions(row: np.ndarray, feature_names: list[str], top: int = 12) -> list[dict[str, Any]]:
@@ -48,7 +52,9 @@ def shap_for_tree_model(model, x_background: np.ndarray, x_explain: np.ndarray, 
         return {"available": False, "error": str(exc), "disclaimer": CAUSATION_DISCLAIMER}
 
     explainer = shap.TreeExplainer(model, data=x_background[: min(400, len(x_background))])
-    values = _positive_class(explainer.shap_values(x_explain))
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", message="LightGBM binary classifier")
+        values = _positive_class(explainer.shap_values(x_explain))
     mean_abs = np.abs(values).mean(axis=0)
     order = np.argsort(-mean_abs)
     global_rows = [

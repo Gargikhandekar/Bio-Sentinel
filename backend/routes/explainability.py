@@ -10,7 +10,7 @@ router = APIRouter(tags=["explainability"])
 def explain(payload: PredictRequest):
     engine = get_engine()
     try:
-        result = engine.predict(payload.features.model_dump())
+        result = engine.predict(payload.features.model_dump(), payload.label)
     except Exception as exc:
         raise HTTPException(
             status_code=503,
@@ -21,7 +21,7 @@ def explain(payload: PredictRequest):
         "header": "WHY DID THE SYSTEM DECIDE THIS?",
         "disclaimer": "Model contribution does not imply causation. Model contribution ≠ causal medical effect.",
         "local": result["explanation"].get("local", []),
-        "global": (results.get("explainability") or {}).get("global", []),
+        "global": ((results.get("explainability_by_label") or {}).get(payload.label) or {}).get("global", []),
         "feature_space": results.get("feature_space"),
         "prediction": result,
     }

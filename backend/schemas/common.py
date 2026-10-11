@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any, Literal, Optional
 
 from pydantic import BaseModel, Field
 
@@ -33,12 +33,16 @@ class FeatureVector(BaseModel):
     chol_check: Optional[float] = None
 
 
+Target = Literal["diabetes", "hypertension", "cvd"]
+
+
 class PredictRequest(BaseModel):
     features: FeatureVector
-    label: str = "diabetes"
+    label: Target = "diabetes"
 
 
 class PredictResponse(BaseModel):
+    label: Target
     prediction: int
     raw_probability: float
     calibrated_probability: float

@@ -1,6 +1,5 @@
 from fastapi import APIRouter
 
-from backend.services.inference import load_results
 from src.config import load_config
 from src.data.loader import load_processed, dataset_summary
 

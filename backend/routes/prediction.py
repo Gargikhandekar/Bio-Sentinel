@@ -2,8 +2,8 @@ from fastapi import APIRouter, HTTPException
 
 from backend.schemas.common import PredictRequest
 from backend.services.inference import DISCLAIMER, get_engine
-from src.persistence.models import PredictionRecord, make_session_factory
 from src.config import load_config
+from src.persistence.models import PredictionRecord, make_session_factory
 
 router = APIRouter(tags=["prediction"])
 
@@ -12,7 +12,7 @@ router = APIRouter(tags=["prediction"])
 def predict(payload: PredictRequest):
     engine = get_engine()
     try:
-        result = engine.predict(payload.features.model_dump())
+        result = engine.predict(payload.features.model_dump(), payload.label)
     except Exception as exc:
         raise HTTPException(
             status_code=503,
@@ -25,7 +25,7 @@ def predict(payload: PredictRequest):
             session.add(
                 PredictionRecord(
                     dataset="brfss_2021",
-                    model="acwe",
+                    model=f"acwe:{payload.label}",
                     prediction=result["prediction"],
                     probability=result["raw_probability"],
                     calibrated_probability=result["calibrated_probability"],
