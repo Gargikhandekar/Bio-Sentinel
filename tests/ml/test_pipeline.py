@@ -55,3 +55,78 @@ def test_cooccurrence_prior_blends_without_using_future_labels():
     out = conf.predict_set(0.92)
     assert 1 in out["prediction_set"]
     assert out["uncertainty"] in {"low", "moderate", "high"}
+
+
+def test_baseline_factory_returns_fresh_instances():
+    from src.models.baselines import build_baselines
+
+    a, b = build_baselines(0), build_baselines(0)
+    assert all(a[name] is not b[name] for name in a)
+
+
+def test_holdout_parts_are_disjoint_and_cover_validation():
+    import pandas as pd
+
+    from src.evaluation.cross_validation import split_holdout
+
+    rng = np.random.default_rng(0)
+    y = pd.DataFrame(rng.integers(0, 2, size=(900, 3)), columns=["diabetes", "hypertension", "cvd"])
+    parts = split_holdout(y, seed=1)
+    sets = [set(v.tolist()) for v in parts.values()]
+    assert sum(len(s) for s in sets) == len(y)
+    assert set.union(*sets) == set(range(len(y)))
+    for i in range(3):
+        for j in range(i + 1, 3):
+            assert not sets[i] & sets[j]
+
+
+def test_preprocessor_statistics_come_from_training_rows_only():
+    from src.evaluation.cross_validation import make_splits
+    from src.data.preprocessing import transform_split
+    from tests.synthetic import make_synthetic_brfss
+
+    splits = make_splits(make_synthetic_brfss(1500), test_size=0.2, val_size=0.2, seed=0)
+    transform_split(splits)
+    imputer = splits.preprocessor.named_transformers_["num"].named_steps["imputer"]
+    assert imputer.statistics_[1] == splits.X_train["bmi"].median()
+    assert imputer.statistics_[1] != splits.X_test["bmi"].median()
+
+
+def test_conformal_reaches_target_coverage_on_exchangeable_data():
+    rng = np.random.default_rng(0)
+    p = rng.uniform(0, 1, 40000)
+    y = (rng.uniform(0, 1, 40000) < p).astype(int)  # p is perfectly calibrated
+    conf = SplitConformalClassifier(alpha=0.1).fit(y[:20000], p[:20000])
+    report = conf.evaluate(y[20000:], p[20000:])
+    assert abs(report["coverage"] - 0.9) < 0.02
+    assert 1.0 <= report["avg_set_size"] <= 2.0
+    neg, pos = conf.predict_sets(np.array([0.92]))
+    assert bool(pos[0]) == (1 in conf.predict_set(0.92)["prediction_set"])
+
+
+def test_isotonic_calibrator_is_monotone_and_never_certain():
+    from src.uncertainty.calibration import ProbabilityCalibrator
+
+    rng = np.random.default_rng(0)
+    p = rng.uniform(0, 1, 5000)
+    y = (rng.uniform(0, 1, 5000) < p**2).astype(int)
+    cal = ProbabilityCalibrator("isotonic").fit(y, p)
+    grid = np.linspace(0, 1, 101)
+    out = cal.transform(grid)
+    assert np.all(np.diff(out) >= 0)
+    assert out.min() >= 1e-3 and out.max() <= 1 - 1e-3
+
+
+def test_acwe_stream_never_uses_the_current_label():
+    from src.evaluation.experiments import acwe_stream
+
+    rng = np.random.default_rng(0)
+    probs = {"a": rng.uniform(size=50), "b": rng.uniform(size=50)}
+    local = {"a": rng.uniform(size=50), "b": rng.uniform(size=50)}
+    y = rng.integers(0, 2, 50)
+    flipped = y.copy()
+    flipped[10] = 1 - flipped[10]
+    base = acwe_stream(probs, local, {"a": 0.8, "b": 0.6}, y, recency_window=20)["acwe"]
+    other = acwe_stream(probs, local, {"a": 0.8, "b": 0.6}, flipped, recency_window=20)["acwe"]
+    np.testing.assert_array_equal(base[:11], other[:11])  # row 10's label only affects rows > 10
+    assert not np.array_equal(base[11:], other[11:])
