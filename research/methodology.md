@@ -22,7 +22,7 @@ Excluded: DIABETE4, DIABAGE3, BPHIGH6, BPMEDS, _RFHYPE6, CVDINFR4, CVDCRHD4, _MI
 
 ## Split
 
-IID stratified train / validation / test. All transformers fitted on training data only. Calibration and conformal quantiles fitted on validation predictions only.
+IID stratified train / validation / test (60/20/20). All transformers fitted on training data only. The validation set is split into three disjoint thirds: ACWE competence + reliability weights, isotonic calibration, and the conformal quantile.
 
 Laptop profile uses a stratified subsample (`training.max_rows`) for wall-clock feasibility. The processed parquet retains the full complete-case table.
 
@@ -34,7 +34,7 @@ Modern tabular: TabNet when PyTorch is present; otherwise a documented MLP subst
 
 Dependency: classifier chain with order hypertension → diabetes → CVD. This is a predictive dependence device, not a causal graph.
 
-Online: River logistic regression, PA, Hoeffding tree; prequential predict-then-update.
+Online: River logistic regression and passive-aggressive; prequential predict-then-update, compared with a majority-class reference.
 
 Ensemble: ACWE
 `score_i(x) = local_competence_i(x) × recent_performance_i × reliability_i`
