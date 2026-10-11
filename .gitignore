@@ -35,8 +35,12 @@ models/metadata/*
 !models/metadata/.gitkeep
 results/metrics/*
 !results/metrics/.gitkeep
+!results/metrics/summary.json
+!results/metrics/summary.csv
+!results/metrics/summary.md
 results/figures/*
 !results/figures/.gitkeep
+!results/figures/*.png
 results/predictions/*
 !results/predictions/.gitkeep
 results/experiments/*
