@@ -1,0 +1,11 @@
+.git
+**/__pycache__
+.pytest_cache
+.venv
+venv
+frontend
+data/raw
+data/processed
+models/trained/*.joblib
+results/experiments/*.json
+*.db
