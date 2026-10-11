@@ -1,0 +1,335 @@
+{
+  "seed": 42,
+  "split_sizes": {
+    "train": 24000,
+    "validation": 8000,
+    "validation_parts": {
+      "competence": 2666,
+      "calibration": 2667,
+      "conformal": 2667
+    },
+    "test": 8000,
+    "compute_profile": "laptop",
+    "max_rows": 40000
+  },
+  "rows": [
+    {
+      "target": "diabetes",
+      "model": "LightGBM",
+      "prevalence": 0.130625,
+      "n_test": 8000,
+      "roc_auc": 0.817038,
+      "pr_auc": 0.376637,
+      "brier": 0.16505,
+      "ece": 0.208891
+    },
+    {
+      "target": "diabetes",
+      "model": "LightGBM + isotonic",
+      "prevalence": 0.130625,
+      "n_test": 8000,
+      "roc_auc": 0.814915,
+      "pr_auc": 0.360294,
+      "brier": 0.09658,
+      "ece": 0.015256
+    },
+    {
+      "target": "diabetes",
+      "model": "Soft vote",
+      "prevalence": 0.130625,
+      "n_test": 8000,
+      "roc_auc": 0.821131,
+      "pr_auc": 0.38757,
+      "brier": 0.159187,
+      "ece": 0.214491
+    },
+    {
+      "target": "diabetes",
+      "model": "ACWE raw",
+      "prevalence": 0.130625,
+      "n_test": 8000,
+      "roc_auc": 0.821018,
+      "pr_auc": 0.387001,
+      "brier": 0.157415,
+      "ece": 0.211777
+    },
+    {
+      "target": "diabetes",
+      "model": "ACWE + isotonic",
+      "prevalence": 0.130625,
+      "n_test": 8000,
+      "roc_auc": 0.818958,
+      "pr_auc": 0.362024,
+      "brier": 0.095925,
+      "ece": 0.015758,
+      "conformal_coverage": 0.923625,
+      "conformal_avg_set_size": 1.136125
+    },
+    {
+      "target": "hypertension",
+      "model": "LightGBM",
+      "prevalence": 0.39175,
+      "n_test": 8000,
+      "roc_auc": 0.805584,
+      "pr_auc": 0.710655,
+      "brier": 0.179845,
+      "ece": 0.068432
+    },
+    {
+      "target": "hypertension",
+      "model": "LightGBM + isotonic",
+      "prevalence": 0.39175,
+      "n_test": 8000,
+      "roc_auc": 0.803214,
+      "pr_auc": 0.690675,
+      "brier": 0.175389,
+      "ece": 0.019629
+    },
+    {
+      "target": "hypertension",
+      "model": "Soft vote",
+      "prevalence": 0.39175,
+      "n_test": 8000,
+      "roc_auc": 0.808262,
+      "pr_auc": 0.713341,
+      "brier": 0.178186,
+      "ece": 0.068809
+    },
+    {
+      "target": "hypertension",
+      "model": "ACWE raw",
+      "prevalence": 0.39175,
+      "n_test": 8000,
+      "roc_auc": 0.808241,
+      "pr_auc": 0.713316,
+      "brier": 0.178207,
+      "ece": 0.068831
+    },
+    {
+      "target": "hypertension",
+      "model": "ACWE + isotonic",
+      "prevalence": 0.39175,
+      "n_test": 8000,
+      "roc_auc": 0.806428,
+      "pr_auc": 0.695835,
+      "brier": 0.17422,
+      "ece": 0.015551,
+      "conformal_coverage": 0.899375,
+      "conformal_avg_set_size": 1.392125
+    },
+    {
+      "target": "cvd",
+      "model": "LightGBM",
+      "prevalence": 0.08125,
+      "n_test": 8000,
+      "roc_auc": 0.820206,
+      "pr_auc": 0.272704,
+      "brier": 0.145448,
+      "ece": 0.213243
+    },
+    {
+      "target": "cvd",
+      "model": "LightGBM + isotonic",
+      "prevalence": 0.08125,
+      "n_test": 8000,
+      "roc_auc": 0.814591,
+      "pr_auc": 0.247654,
+      "brier": 0.066823,
+      "ece": 0.007421
+    },
+    {
+      "target": "cvd",
+      "model": "Soft vote",
+      "prevalence": 0.08125,
+      "n_test": 8000,
+      "roc_auc": 0.831549,
+      "pr_auc": 0.286723,
+      "brier": 0.140581,
+      "ece": 0.223882
+    },
+    {
+      "target": "cvd",
+      "model": "ACWE raw",
+      "prevalence": 0.08125,
+      "n_test": 8000,
+      "roc_auc": 0.830995,
+      "pr_auc": 0.286267,
+      "brier": 0.137479,
+      "ece": 0.219358
+    },
+    {
+      "target": "cvd",
+      "model": "ACWE + isotonic",
+      "prevalence": 0.08125,
+      "n_test": 8000,
+      "roc_auc": 0.826487,
+      "pr_auc": 0.268288,
+      "brier": 0.065949,
+      "ece": 0.009224,
+      "conformal_coverage": 0.91775,
+      "conformal_avg_set_size": 1.0
+    }
+  ],
+  "conformal": {
+    "diabetes": {
+      "target_coverage": 0.9,
+      "coverage": 0.923625,
+      "coverage_positive": 0.433493,
+      "coverage_negative": 0.997268,
+      "avg_set_size": 1.136125,
+      "singleton_rate": 0.863875,
+      "quantile": 0.683036,
+      "n": 8000,
+      "n_calibration": 2667
+    },
+    "hypertension": {
+      "target_coverage": 0.9,
+      "coverage": 0.899375,
+      "coverage_positive": 0.828015,
+      "coverage_negative": 0.945335,
+      "avg_set_size": 1.392125,
+      "singleton_rate": 0.607875,
+      "quantile": 0.658065,
+      "n": 8000,
+      "n_calibration": 2667
+    },
+    "cvd": {
+      "target_coverage": 0.9,
+      "coverage": 0.91775,
+      "coverage_positive": 0.047692,
+      "coverage_negative": 0.994694,
+      "avg_set_size": 1.0,
+      "singleton_rate": 1.0,
+      "quantile": 0.319149,
+      "n": 8000,
+      "n_calibration": 2667
+    }
+  },
+  "ablation_by_label": {
+    "diabetes": [
+      {
+        "variant": "full",
+        "roc_auc": 0.818958,
+        "delta_vs_full": 0.0,
+        "brier": 0.095925,
+        "ece": 0.015758,
+        "delta_brier_vs_full": 0.0,
+        "delta_ece_vs_full": 0.0
+      },
+      {
+        "variant": "no_dynamic_weighting",
+        "roc_auc": 0.818812,
+        "delta_vs_full": -0.000146,
+        "brier": 0.095732,
+        "ece": 0.014008,
+        "delta_brier_vs_full": -0.000192,
+        "delta_ece_vs_full": -0.001751
+      },
+      {
+        "variant": "no_local_competence",
+        "roc_auc": 0.819561,
+        "delta_vs_full": 0.000603,
+        "brier": 0.095746,
+        "ece": 0.013983,
+        "delta_brier_vs_full": -0.000179,
+        "delta_ece_vs_full": -0.001776
+      },
+      {
+        "variant": "no_calibration",
+        "roc_auc": 0.821018,
+        "delta_vs_full": 0.00206,
+        "brier": 0.157415,
+        "ece": 0.211777,
+        "delta_brier_vs_full": 0.061491,
+        "delta_ece_vs_full": 0.196019
+      }
+    ],
+    "hypertension": [
+      {
+        "variant": "full",
+        "roc_auc": 0.806428,
+        "delta_vs_full": 0.0,
+        "brier": 0.17422,
+        "ece": 0.015551,
+        "delta_brier_vs_full": 0.0,
+        "delta_ece_vs_full": 0.0
+      },
+      {
+        "variant": "no_dynamic_weighting",
+        "roc_auc": 0.806435,
+        "delta_vs_full": 7e-06,
+        "brier": 0.174341,
+        "ece": 0.014714,
+        "delta_brier_vs_full": 0.00012,
+        "delta_ece_vs_full": -0.000837
+      },
+      {
+        "variant": "no_local_competence",
+        "roc_auc": 0.806315,
+        "delta_vs_full": -0.000114,
+        "brier": 0.174242,
+        "ece": 0.017153,
+        "delta_brier_vs_full": 2.2e-05,
+        "delta_ece_vs_full": 0.001602
+      },
+      {
+        "variant": "no_calibration",
+        "roc_auc": 0.808241,
+        "delta_vs_full": 0.001813,
+        "brier": 0.178207,
+        "ece": 0.068831,
+        "delta_brier_vs_full": 0.003987,
+        "delta_ece_vs_full": 0.053279
+      }
+    ],
+    "cvd": [
+      {
+        "variant": "full",
+        "roc_auc": 0.826487,
+        "delta_vs_full": 0.0,
+        "brier": 0.065949,
+        "ece": 0.009224,
+        "delta_brier_vs_full": 0.0,
+        "delta_ece_vs_full": 0.0
+      },
+      {
+        "variant": "no_dynamic_weighting",
+        "roc_auc": 0.825631,
+        "delta_vs_full": -0.000856,
+        "brier": 0.066132,
+        "ece": 0.008626,
+        "delta_brier_vs_full": 0.000183,
+        "delta_ece_vs_full": -0.000597
+      },
+      {
+        "variant": "no_local_competence",
+        "roc_auc": 0.826192,
+        "delta_vs_full": -0.000295,
+        "brier": 0.066015,
+        "ece": 0.009513,
+        "delta_brier_vs_full": 6.6e-05,
+        "delta_ece_vs_full": 0.000289
+      },
+      {
+        "variant": "no_calibration",
+        "roc_auc": 0.830995,
+        "delta_vs_full": 0.004508,
+        "brier": 0.137479,
+        "ece": 0.219358,
+        "delta_brier_vs_full": 0.07153,
+        "delta_ece_vs_full": 0.210134
+      }
+    ]
+  },
+  "online": {
+    "static_reference_prequential_acc": 0.6924,
+    "majority_class_prequential_acc": 0.8388,
+    "online": {
+      "online_logreg": 0.8256,
+      "passive_aggressive": 0.838
+    },
+    "drift_events": [],
+    "injected_at": 1250,
+    "note": "A controlled sequential stream is constructed from static public data to investigate robustness under simulated distribution shift. Accuracy is threshold-dependent and should be read against the majority-class reference; the static model uses balanced class weights."
+  }
+}
