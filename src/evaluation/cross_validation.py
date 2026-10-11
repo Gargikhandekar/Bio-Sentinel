@@ -47,3 +47,23 @@ def make_splits(
         y_test=y_test.reset_index(drop=True),
         preprocessor=preprocessor,
     )
+
+
+HOLDOUT_PARTS = ("competence", "calibration", "conformal")
+
+
+def split_holdout(y_val: pd.DataFrame, seed: int) -> dict[str, np.ndarray]:
+    """Split the validation holdout into three disjoint, label-stratified thirds.
+
+    Each fitting step after model training gets its own data: ACWE competence and
+    reliability weights, the isotonic calibrator, and the conformal quantile. Reusing
+    one set for calibration and conformal scores would make the scores optimistic
+    and void the coverage guarantee.
+    """
+    idx = np.arange(len(y_val))
+    strata = stratified_label_key(y_val)
+    competence, rest = train_test_split(idx, train_size=1 / 3, stratify=strata, random_state=seed)
+    calibration, conformal = train_test_split(
+        rest, train_size=0.5, stratify=strata.iloc[rest], random_state=seed
+    )
+    return {"competence": np.sort(competence), "calibration": np.sort(calibration), "conformal": np.sort(conformal)}

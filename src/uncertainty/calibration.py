@@ -8,8 +8,11 @@ from sklearn.linear_model import LogisticRegression
 
 
 class ProbabilityCalibrator:
-    def __init__(self, method: str = "isotonic") -> None:
+    def __init__(self, method: str = "isotonic", clip: float = 1e-3) -> None:
         self.method = method
+        # Isotonic regression returns exactly 0 or 1 in its end bins; a few thousand
+        # calibration rows cannot justify certainty, so outputs are clipped.
+        self.clip = clip
         self._iso: IsotonicRegression | None = None
         self._platt: LogisticRegression | None = None
 
@@ -34,4 +37,5 @@ class ProbabilityCalibrator:
             out = self._platt.predict_proba(arr.reshape(-1, 1))[:, 1]
         else:
             out = arr
+        out = np.clip(out, self.clip, 1 - self.clip)
         return float(out[0]) if scalar else out

@@ -9,6 +9,38 @@ import numpy as np
 CAUSATION_DISCLAIMER = "Model contribution does not imply causation."
 
 
+def _positive_class(values) -> np.ndarray:
+    """Normalise SHAP output across versions to an (n_rows, n_features) array for class 1."""
+    if isinstance(values, list):
+        values = values[1]
+    values = np.asarray(values)
+    if values.ndim == 3:
+        values = values[:, :, 1]
+    return values
+
+
+def shap_matrix(model, x: np.ndarray) -> np.ndarray | None:
+    """Exact TreeSHAP values (tree-path-dependent, no background sample needed)."""
+    try:
+        import shap
+    except Exception:
+        return None
+    return _positive_class(shap.TreeExplainer(model).shap_values(x))
+
+
+def local_contributions(row: np.ndarray, feature_names: list[str], top: int = 12) -> list[dict[str, Any]]:
+    pairs = sorted(enumerate(row), key=lambda kv: -abs(kv[1]))[:top]
+    return [
+        {
+            "feature": feature_names[idx] if idx < len(feature_names) else f"f{idx}",
+            "contribution": float(val),
+            "direction": "increased_risk" if val > 0 else "reduced_risk",
+            "magnitude": float(abs(val)),
+        }
+        for idx, val in pairs
+    ]
+
+
 def shap_for_tree_model(model, x_background: np.ndarray, x_explain: np.ndarray, feature_names: list[str]) -> dict[str, Any]:
     try:
         import shap
@@ -16,36 +48,18 @@ def shap_for_tree_model(model, x_background: np.ndarray, x_explain: np.ndarray, 
         return {"available": False, "error": str(exc), "disclaimer": CAUSATION_DISCLAIMER}
 
     explainer = shap.TreeExplainer(model, data=x_background[: min(400, len(x_background))])
-    values = explainer.shap_values(x_explain)
-    if isinstance(values, list):
-        values = values[1]
-    values = np.asarray(values)
-    if values.ndim == 3:
-        values = values[:, :, 1]
+    values = _positive_class(explainer.shap_values(x_explain))
     mean_abs = np.abs(values).mean(axis=0)
     order = np.argsort(-mean_abs)
     global_rows = [
         {"feature": feature_names[i] if i < len(feature_names) else f"f{i}", "mean_abs_shap": float(mean_abs[i])}
         for i in order[:20]
     ]
-    local = []
-    if len(x_explain):
-        row = values[0]
-        pairs = sorted(enumerate(row), key=lambda kv: -abs(kv[1]))[:12]
-        for idx, val in pairs:
-            local.append(
-                {
-                    "feature": feature_names[idx] if idx < len(feature_names) else f"f{idx}",
-                    "contribution": float(val),
-                    "direction": "increased_risk" if val > 0 else "reduced_risk",
-                    "magnitude": float(abs(val)),
-                }
-            )
     return {
         "available": True,
         "disclaimer": CAUSATION_DISCLAIMER,
         "global": global_rows,
-        "local": local,
+        "local": local_contributions(values[0], feature_names) if len(x_explain) else [],
     }
 
 

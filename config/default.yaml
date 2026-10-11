@@ -66,8 +66,14 @@ features:
     - _MICHD
     - CVDSTRK3
 
+paths:
+  models_dir: models/trained
+  results_dir: results
+
 training:
   test_size: 0.2
+  # The validation holdout is split into three disjoint, label-stratified thirds:
+  # ACWE competence/reliability, isotonic calibration, conformal calibration.
   validation_size: 0.2
   folds: 5
   max_rows: 40000
@@ -94,14 +100,12 @@ uncertainty:
   alpha: 0.1
 
 modern_tabular:
-  architecture: tabnet
+  # TabNet is used only if pytorch-tabnet is installed; otherwise a CPU MLP (recorded in results).
   max_epochs: 25
   batch_size: 2048
   subsample_rows: 25000
   note: "TabNet trained on a stratified subsample because the laptop CPU profile cannot fit full BRFSS + TabNet."
 
-online:
-  models: [sgd_logreg, passive_aggressive, hoeffding_tree]
 
 api:
   host: 0.0.0.0
