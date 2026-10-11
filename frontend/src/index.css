@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  background: #080b0f;
+}
+
+body {
+  font-family: "IBM Plex Sans", Inter, system-ui, sans-serif;
+  letter-spacing: 0.01em;
+}
+
+.mono {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+}
+
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(85, 230, 210, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(85, 230, 210, 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid #55e6d2;
+  outline-offset: 2px;
+}

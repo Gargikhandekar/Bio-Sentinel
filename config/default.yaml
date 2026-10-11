@@ -1,0 +1,111 @@
+# BIO-SENTINEL default configuration
+# CPU / laptop profile. Increase max_rows only if you have more RAM/time.
+
+seed: 42
+compute_profile: laptop
+
+dataset:
+  name: brfss_2021
+  version: "2021"
+  source: "CDC Behavioral Risk Factor Surveillance System LLCP 2021 public-use file"
+  official_url: "https://www.cdc.gov/brfss/annual_data/annual_2021.html"
+  retrieval_note: "Official CDC host returned 403 from this environment; file retrieved from Internet Archive snapshot of the same CDC URL (2024-02-26)."
+  raw_path: data/raw/LLCP2021.XPT
+  processed_path: data/processed/brfss_2021_multilabel.parquet
+  n_records_official: 438693
+  missing_geography: "Florida is absent from the 2021 national public-use file."
+
+labels:
+  diabetes:
+    source: DIABETE4
+    positive: [1]
+    negative: [2, 3, 4]
+    drop: [7, 9]
+    definition: "Self-reported doctor-diagnosed diabetes. Pregnancy-only and prediabetes/borderline coded as negative."
+  hypertension:
+    source: BPHIGH6
+    positive: [1]
+    negative: [2, 3, 4]
+    drop: [7, 9]
+    definition: "Told by a health professional they have high blood pressure. Pregnancy-only and borderline coded as negative."
+  cvd:
+    source: _MICHD
+    positive: [1]
+    negative: [2]
+    definition: "Ever reported coronary heart disease or myocardial infarction (CDC calculated variable)."
+
+features:
+  numeric:
+    - age_group
+    - bmi
+    - gen_health
+    - phys_unhealthy_days
+    - ment_unhealthy_days
+    - education
+    - income
+  categorical:
+    - sex
+    - race_group
+    - smoker
+    - phys_activity
+    - fruits_daily
+    - veggies_daily
+    - difficulty_walking
+    - healthcare_coverage
+    - binge_drinking
+    - high_cholesterol
+    - chol_check
+  excluded_as_leakage:
+    - DIABETE4
+    - DIABAGE3
+    - BPHIGH6
+    - BPMEDS
+    - _RFHYPE6
+    - CVDINFR4
+    - CVDCRHD4
+    - _MICHD
+    - CVDSTRK3
+
+training:
+  test_size: 0.2
+  validation_size: 0.2
+  folds: 5
+  max_rows: 40000
+  class_weight: balanced
+
+ensemble:
+  neighborhood_size: 25
+  minimum_competence_samples: 20
+  recency_window: 200
+  name: ACWE
+  name_note: "Adaptive Context-Weighted Ensemble is an integration of existing DES/competence/online methods, not a new algorithm."
+
+drift:
+  detector: ADWIN
+  delta: 0.002
+  numerical_shift_features: [bmi, gen_health]
+  class_prior_shift: 0.15
+
+calibration:
+  method: isotonic
+
+uncertainty:
+  method: conformal
+  alpha: 0.1
+
+modern_tabular:
+  architecture: tabnet
+  max_epochs: 25
+  batch_size: 2048
+  subsample_rows: 25000
+  note: "TabNet trained on a stratified subsample because the laptop CPU profile cannot fit full BRFSS + TabNet."
+
+online:
+  models: [sgd_logreg, passive_aggressive, hoeffding_tree]
+
+api:
+  host: 0.0.0.0
+  port: 8000
+
+database:
+  url: sqlite:///./bio_sentinel.db

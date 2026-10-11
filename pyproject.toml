@@ -1,0 +1,11 @@
+[project]
+name = "bio-sentinel"
+version = "0.1.0"
+description = "Adaptive computational intelligence for chronic disease risk prognostics (research prototype)."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
