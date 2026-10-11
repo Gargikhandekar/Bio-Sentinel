@@ -107,9 +107,11 @@ def run_all_experiments(config_path: Path | None = None) -> dict[str, Any]:
     test_probs: dict[str, dict[str, np.ndarray]] = {}
     val_probs: dict[str, dict[str, np.ndarray]] = {}
 
-    baselines = build_baselines(cfg["seed"])
     for label in LABELS:
         LOGGER.info("Training baselines for %s", label)
+        # Fresh instances per label: re-fitting shared objects would leave every
+        # label's entry pointing at the model fitted on the last label (cvd).
+        baselines = build_baselines(cfg["seed"])
         y_tr = splits.y_train[label].to_numpy()
         y_va = splits.y_val[label].to_numpy()
         y_te = splits.y_test[label].to_numpy()
